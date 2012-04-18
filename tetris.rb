@@ -3,28 +3,44 @@ require 'timeout'
 
 include Curses
 
-PIECE1 = <<PIECE
+PIECE1 = []
+PIECE1 << <<PIECE
 111100000000
 111100000000
 111111111111
 111111111111
 PIECE
 
-PIECE2 = <<PIECE
+PIECE1 << <<PIECE
+11111111
+11111111
+11110000
+11110000
+11110000
+11110000
+PIECE
+
+PIECE1 << PIECE1[0].split.reverse.map { |i| i.split(//).reverse }.map(&:join).join("\n")
+PIECE1 << PIECE1[1].split.map { |i| i.split(//).reverse }.map(&:join).reverse.join("\n")
+
+PIECE2 = []
+PIECE2 << <<PIECE
 000000001111
 000000001111
 111111111111
 111111111111
 PIECE
 
-PIECE3 = <<PIECE
+PIECE3 = []
+PIECE3 << <<PIECE
 11111111
 11111111
 11111111
 11111111
 PIECE
 
-PIECE4 = <<PIECE
+PIECE4 = []
+PIECE4 << <<PIECE
 1111
 1111
 1111
@@ -35,7 +51,8 @@ PIECE4 = <<PIECE
 1111
 PIECE
 
-PIECE5 = <<PIECE
+PIECE5 = []
+PIECE5 << <<PIECE
 000011110000
 000011110000
 111111111111
@@ -71,12 +88,18 @@ def move_piece(dx, dy)
     @bottom_pieces << [@posX, @posY, @piece, @color]
     @posX  = @width / 2
     @posY  = 0
-    @piece = @pieces.sample
+    @cur_pieces = @pieces.sample
+    @piece = @cur_pieces.first
     @color = @colors.sample
   end
   
   @posX += dx
   @posY += dy
+end
+
+def rotate_piece
+  @cur_pieces.rotate!
+  @piece = @cur_pieces.first
 end
 
 def init_colors
@@ -106,7 +129,8 @@ init_screen do
   @posX = @width / 2
   @posY = 0
   @pieces = [PIECE1, PIECE2, PIECE3, PIECE4, PIECE5]
-  @piece = @pieces.sample
+  @cur_pieces = @pieces.sample
+  @piece = @cur_pieces.first
   @bottom_pieces = []
   @color = @colors.sample
 
@@ -116,7 +140,7 @@ init_screen do
     begin
       Timeout::timeout(1) do
         case Curses.getch
-          when Curses::Key::UP    then move_piece(0,-4)
+          when Curses::Key::UP    then rotate_piece
           when Curses::Key::DOWN  then move_piece(0,4)
           when Curses::Key::LEFT  then move_piece(-4,0)
           when Curses::Key::RIGHT then move_piece(4,0)
