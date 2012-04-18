@@ -1,17 +1,18 @@
 require 'curses'
+include Curses
 
 PIECE1 = <<PIECE
-OO
-OO
-OOOOOO
-OOOOOO
+110000
+110000
+111111
+111111
 PIECE
 
 PIECE2 = <<PIECE
-    OO
-    OO
-OOOOOO
-OOOOOO
+000011
+000011
+111111
+111111
 PIECE
 
 def write(x, y, text)
@@ -20,12 +21,14 @@ def write(x, y, text)
 end
 
 def draw_piece(x, y, piece)
+  Curses.attron(color_pair(COLOR_RED))
   blocks = piece.split.map { |i| i.split(//) }
   blocks.each_with_index do |row,i|
     row.each_with_index do |c,j|
-      write(x+j, y+i, c)
+      write(x+j, y+i, c) if c == "1"
     end
   end
+  Curses.attroff(color_pair(COLOR_RED))
 end
 
 def move_piece(dx, dy)
@@ -44,6 +47,8 @@ def init_screen
   Curses.noecho
   Curses.curs_set(0)
   Curses.init_screen
+  Curses.start_color
+  Curses.init_pair(COLOR_RED, COLOR_RED, COLOR_RED)
   Curses.stdscr.keypad(true)
   begin
     yield
@@ -57,7 +62,7 @@ init_screen do
   @height = Curses.lines
   @posX = 0
   @posY = 0
-  @piece = PIECE1
+  @piece = PIECE2
 
   draw_piece(@posX, @posY, @piece)
   
@@ -70,7 +75,6 @@ init_screen do
     end
 
     Curses.clear
-    write(@width-15, @height-1, "(#{@posX},#{@posY})")
     draw_piece(@posX, @posY, @piece)
     Curses.refresh
   end
