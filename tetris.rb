@@ -38,7 +38,15 @@ def move_piece(dx, dy)
   max_x = @piece.split.max_by { |i| i.size }.size
   return nil if (@posX + dx + max_x) >= @width
   max_y = @piece.split.size
-  return nil if (@posY + dy + max_y) > @height
+
+  # Piece has reached the bottom
+  if (@posY + dy + max_y) > @height
+    @bottom_pieces << [@posX, @posY, @piece]
+    @posX  = @width / 2
+    @posY  = 0
+    @piece = @pieces.sample
+  end
+  
   @posX += dx
   @posY += dy
 end
@@ -60,9 +68,11 @@ end
 init_screen do
   @width  = Curses.cols
   @height = Curses.lines
-  @posX = 0
+  @posX = @width / 2
   @posY = 0
-  @piece = PIECE2
+  @pieces = [PIECE1, PIECE2]
+  @piece = @pieces.sample
+  @bottom_pieces = []
 
   draw_piece(@posX, @posY, @piece)
   
@@ -76,6 +86,7 @@ init_screen do
 
     Curses.clear
     draw_piece(@posX, @posY, @piece)
+    @bottom_pieces.each { |p| draw_piece(*p) }
     Curses.refresh
   end
 end
