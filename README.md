@@ -1,5 +1,5 @@
-## Tetris...
-### In your terminal!
+# Tetris...
+## In your terminal!
 
 I wanted to mess around with curses and Ruby, so I decided to write a little Tetris clone.
 
