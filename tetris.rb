@@ -124,11 +124,13 @@ def move_piece(dx, dy)
   
   @posX += dx
   @posY += dy
+  update
 end
 
 def rotate_piece
   @cur_pieces.rotate!
   @piece = @cur_pieces.first
+  update
 end
 
 def init_colors
@@ -138,8 +140,16 @@ def init_colors
   @colors = [COLOR_RED,COLOR_CYAN,COLOR_GREEN]
 end
 
+def update
+  Curses.clear
+  draw_piece(@posX, @posY, @piece)
+  @bottom_pieces.each { |p| draw_piece(*p) }
+  Curses.refresh
+end
+
 def init_screen
   Curses.noecho
+  Curses.stdscr.nodelay = true
   Curses.curs_set(0)
   Curses.init_screen
   Curses.start_color
@@ -162,26 +172,23 @@ init_screen do
   @piece = @cur_pieces.first
   @bottom_pieces = []
   @color = @colors.sample
+  @delay = 1
+  @last_update = Time.now
 
   draw_piece(@posX, @posY, @piece)
   
   loop do
-    begin
-      Timeout::timeout(1) do
-        case Curses.getch
-          when Curses::Key::UP    then rotate_piece
-          when Curses::Key::DOWN  then move_piece(0,4)
-          when Curses::Key::LEFT  then move_piece(-4,0)
-          when Curses::Key::RIGHT then move_piece(4,0)
-        end
-      end
-    rescue Timeout::Error
-      move_piece(0,4)
+    
+    case Curses.getch
+      when Curses::Key::UP    then rotate_piece
+      when Curses::Key::DOWN  then move_piece(0,4)
+      when Curses::Key::LEFT  then move_piece(-4,0)
+      when Curses::Key::RIGHT then move_piece(4,0)
     end
 
-    Curses.clear
-    draw_piece(@posX, @posY, @piece)
-    @bottom_pieces.each { |p| draw_piece(*p) }
-    Curses.refresh
+    if Time.now - @last_update > @delay
+      move_piece(0,4)
+      @last_update = Time.now
+    end
   end
 end
