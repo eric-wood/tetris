@@ -31,6 +31,18 @@ PIECE2 << <<PIECE
 111111111111
 PIECE
 
+PIECE2 << <<PIECE
+11110000
+11110000
+11110000
+11110000
+11111111
+11111111
+PIECE
+
+PIECE2 << PIECE2[0].split.reverse.map { |i| i.split(//).reverse }.map(&:join).join("\n")
+PIECE2 << PIECE2[1].split.map { |i| i.split(//).reverse }.map(&:join).reverse.join("\n")
+
 PIECE3 = []
 PIECE3 << <<PIECE
 11111111
@@ -51,6 +63,11 @@ PIECE4 << <<PIECE
 1111
 PIECE
 
+PIECE4 << <<PIECE
+1111111111111111
+1111111111111111
+PIECE
+
 PIECE5 = []
 PIECE5 << <<PIECE
 000011110000
@@ -58,6 +75,18 @@ PIECE5 << <<PIECE
 111111111111
 111111111111
 PIECE
+
+PIECE5 << <<PIECE
+11110000
+11110000
+11111111
+11111111
+11110000
+11110000
+PIECE
+
+PIECE5 << PIECE5[0].split.reverse.map { |i| i.split(//).reverse }.map(&:join).join("\n")
+PIECE5 << PIECE5[1].split.map { |i| i.split(//).reverse }.map(&:join).reverse.join("\n")
 
 def write(x, y, text)
   Curses.setpos(y, x)
